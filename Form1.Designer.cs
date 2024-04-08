@@ -38,21 +38,20 @@
             // messagetextBox
             // 
             messagetextBox.Dock = DockStyle.Fill;
-            messagetextBox.Location = new Point(3, 3);
-            messagetextBox.MaximumSize = new Size(0, 30);
-            messagetextBox.MinimumSize = new Size(0, 30);
+            messagetextBox.Location = new Point(2, 2);
+            messagetextBox.Margin = new Padding(2);
             messagetextBox.Name = "messagetextBox";
-            messagetextBox.Size = new Size(272, 30);
+            messagetextBox.Size = new Size(191, 23);
             messagetextBox.TabIndex = 1;
+            messagetextBox.KeyDown += messagetextBox_KeyDown;
             // 
             // sendButton
             // 
             sendButton.Dock = DockStyle.Fill;
-            sendButton.Location = new Point(281, 3);
-            sendButton.MaximumSize = new Size(90, 30);
-            sendButton.MinimumSize = new Size(90, 30);
+            sendButton.Location = new Point(197, 2);
+            sendButton.Margin = new Padding(2);
             sendButton.Name = "sendButton";
-            sendButton.Size = new Size(90, 30);
+            sendButton.Size = new Size(66, 25);
             sendButton.TabIndex = 0;
             sendButton.Text = "Send";
             sendButton.UseVisualStyleBackColor = true;
@@ -62,15 +61,16 @@
             // 
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 70F));
             tableLayoutPanel1.Controls.Add(sendButton, 1, 0);
             tableLayoutPanel1.Controls.Add(messagetextBox, 0, 0);
             tableLayoutPanel1.Dock = DockStyle.Bottom;
-            tableLayoutPanel1.Location = new Point(0, 508);
+            tableLayoutPanel1.Location = new Point(0, 297);
+            tableLayoutPanel1.Margin = new Padding(2);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(378, 36);
+            tableLayoutPanel1.Size = new Size(265, 29);
             tableLayoutPanel1.TabIndex = 1;
             // 
             // messagesPanel
@@ -78,19 +78,21 @@
             messagesPanel.AutoScroll = true;
             messagesPanel.Dock = DockStyle.Fill;
             messagesPanel.Location = new Point(0, 0);
+            messagesPanel.Margin = new Padding(2);
             messagesPanel.Name = "messagesPanel";
-            messagesPanel.Size = new Size(378, 508);
+            messagesPanel.Size = new Size(265, 297);
             messagesPanel.TabIndex = 2;
             messagesPanel.SizeChanged += messagesPanel_SizeChanged;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(378, 544);
+            ClientSize = new Size(265, 326);
             Controls.Add(messagesPanel);
             Controls.Add(tableLayoutPanel1);
-            MinimumSize = new Size(320, 480);
+            Margin = new Padding(2);
+            MinimumSize = new Size(229, 304);
             Name = "Form1";
             Text = "Group Chat";
             KeyDown += Form1_KeyDown;

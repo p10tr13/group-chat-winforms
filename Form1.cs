@@ -40,26 +40,31 @@ namespace WinFormsLab
             MC.Location = new Point(width, height);
             messagetextBox.Clear();
             messagesPanel.Controls.Add(MC);
-            MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0); ;
+            MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0);
             messagesPanel.ScrollControlIntoView(MC);
             you_not_you_counter++;
         }
 
         private void messagesPanel_SizeChanged(object sender, EventArgs e)
         {
+            int LocationY = 0;
             foreach (Control control in messagesPanel.Controls)
             {
                 if (control is messageControl MC)
                 {
                     if (MC.mess.Sender == "You")
                     {
-                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0);
-                        MC.Location = new Point(50, MC.Location.Y);
+                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0) - 5;
+                        MC.Location = new Point(50, LocationY);
+                        MC.Set_Preferred_Height();
+                        LocationY = LocationY + MC.Height + 5;
                     }
                     else
                     {
-                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0); ;
-                        MC.Location = new Point(0, MC.Location.Y);
+                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0) - 5;
+                        MC.Location = new Point(0, LocationY);
+                        MC.Set_Preferred_Height();
+                        LocationY = LocationY + MC.Height + 5;
                     }
                 }
             }
@@ -69,7 +74,15 @@ namespace WinFormsLab
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter) 
+            if (e.KeyCode == Keys.Enter)
+            {
+                sendButton_Click(sender, e);
+            }
+        }
+
+        private void messagetextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
             {
                 sendButton_Click(sender, e);
             }

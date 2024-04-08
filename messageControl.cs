@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Messages;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsLab
 {
@@ -72,6 +73,21 @@ namespace WinFormsLab
             nameLabel.Location = new Point(5, 5);
             dateLabel.Location = new Point(this.Width - dateLabel.Width - 5, this.Height - dateLabel.Height - 5);
             Anchor = AnchorStyles.Left | AnchorStyles.Top;
+            Set_Preferred_Height();
+        }
+
+        private void messageTextBox_TextChanged(object sender, EventArgs e)
+        {
+            int lines = messageTextBox.GetLineFromCharIndex(messageTextBox.TextLength) + 1;
+            messageTextBox.Height = messageTextBox.Font.Height * lines + messageTextBox.Height - messageTextBox.ClientSize.Height;
+        }
+
+        public int Set_Preferred_Height()
+        {
+            messageTextBox_TextChanged(null, null);
+            int cos = tableLayoutPanel1.GetRowHeights()[2];
+            Height = messageTextBox.Height + tableLayoutPanel1.GetRowHeights()[0] + tableLayoutPanel1.GetRowHeights()[2];
+            return messageTextBox.Height + tableLayoutPanel1.GetRowHeights()[0] + tableLayoutPanel1.GetRowHeights()[2];
         }
     }
 }
