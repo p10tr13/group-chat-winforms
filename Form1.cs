@@ -1,8 +1,14 @@
+using System.Net.Sockets;
+
 namespace WinFormsLab
 {
     public partial class Form1 : Form
     {
         int you_not_you_counter = 0;
+
+        public bool connected;
+
+        TcpClient? tcpClient;
 
         public Form1()
         {
@@ -10,7 +16,7 @@ namespace WinFormsLab
             messagesPanel.AutoScrollMargin = new System.Drawing.Size(0, 0);
             messagesPanel.AutoScrollMinSize = new System.Drawing.Size(0, messagesPanel.Height + 1);
             messagesPanel.HorizontalScroll.Enabled = false;
-
+            connected = false;
         }
 
         private void sendButton_Click(object sender, EventArgs e)
@@ -18,7 +24,6 @@ namespace WinFormsLab
             if (messagetextBox.Text.Length == 0)
                 return;
             messageControl MC;
-            int height = 0, width = 0;
             if (you_not_you_counter % 2 == 0)
             {
                 MC = new messageControl("You", messagetextBox.Text, DateTime.Now);
@@ -27,49 +32,8 @@ namespace WinFormsLab
             {
                 MC = new messageControl("NotYou", messagetextBox.Text, DateTime.Now);
             }
-
-            if (messagesPanel.Controls.Count > 0)
-            {
-                Control lastMessage = messagesPanel.Controls[messagesPanel.Controls.Count - 1];
-                height = lastMessage.Bottom + 5;
-            }
-            if (you_not_you_counter % 2 == 0)
-            {
-                width = 50;
-            }
-            MC.Location = new Point(width, height);
-            messagetextBox.Clear();
-            messagesPanel.Controls.Add(MC);
-            MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0);
-            messagesPanel.ScrollControlIntoView(MC);
+            Add_Message(MC);
             you_not_you_counter++;
-        }
-
-        private void messagesPanel_SizeChanged(object sender, EventArgs e)
-        {
-            int LocationY = 0;
-            foreach (Control control in messagesPanel.Controls)
-            {
-                if (control is messageControl MC)
-                {
-                    if (MC.mess.Sender == "You")
-                    {
-                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0) - 5;
-                        MC.Location = new Point(50, LocationY);
-                        MC.Set_Preferred_Height();
-                        LocationY = LocationY + MC.Height + 5;
-                    }
-                    else
-                    {
-                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0) - 5;
-                        MC.Location = new Point(0, LocationY);
-                        MC.Set_Preferred_Height();
-                        LocationY = LocationY + MC.Height + 5;
-                    }
-                }
-            }
-            messagesPanel.AutoScrollMinSize = new System.Drawing.Size(0, messagesPanel.Height + 1);
-            messagesPanel.HorizontalScroll.Visible = false;
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -85,6 +49,109 @@ namespace WinFormsLab
             if (e.KeyCode == Keys.Enter)
             {
                 sendButton_Click(sender, e);
+            }
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            int LocationY = 0;
+            foreach (Control control in messagesPanel.Controls)
+            {
+                if (control is messageControl MC)
+                {
+                    if (MC.mess.Sender == "You")
+                    {
+                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0) - 5;
+                        MC.Location = new Point(50, LocationY);
+                    }
+                    else
+                    {
+                        MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0) - 5;
+                        MC.Location = new Point(0, LocationY);
+                    }
+                    MC.Set_Preferred_Height();
+                    LocationY = LocationY + MC.Height + 5;
+                }
+                else if (control is Label LB)
+                {
+                    LB.Location = new Point((messagesPanel.Width - LB.Width) / 2, LocationY);
+                    LocationY = LocationY + LB.Height + 5;
+                }
+            }
+            messagesPanel.AutoScrollPosition = new Point(0, 0);
+            messagesPanel.VerticalScroll.Value = 0;
+            messagesPanel.AutoScrollMinSize = new System.Drawing.Size(0, messagesPanel.Height + 1);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (connected)
+            {
+                connected = false;
+            }
+            Close();
+        }
+
+        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ConnectionDialog connectionDialog = new ConnectionDialog(this);
+            connectionDialog.ShowDialog();
+        }
+
+        public void Update_Client(TcpClient client)
+        {
+            tcpClient = client;
+            connected = true;
+            connectToolStripMenuItem.Enabled = false;
+            disconectToolStripMenuItem.Enabled = true;
+            Add_Label("Connected");
+        }
+
+        private void Add_Label(string text)
+        {
+            int height = 0;
+            if (messagesPanel.Controls.Count > 0)
+            {
+                Control lastMessage = messagesPanel.Controls[messagesPanel.Controls.Count - 1];
+                height = lastMessage.Bottom + 5;
+            }
+            Label connectLabel = new Label();
+            connectLabel.ForeColor = Color.LightGray;
+            connectLabel.Text = text;
+            int middle = (messagesPanel.Width - connectLabel.Width) / 2;
+            messagesPanel.Controls.Add(connectLabel);
+            connectLabel.Location = new Point(middle, height);
+            messagesPanel.ScrollControlIntoView(connectLabel);
+        }
+
+        private void Add_Message(messageControl MC)
+        {
+            int height = 0, width = 0;
+            if (messagesPanel.Controls.Count > 0)
+            {
+                Control lastMessage = messagesPanel.Controls[messagesPanel.Controls.Count - 1];
+                height = lastMessage.Bottom + 5;
+            }
+            if (MC.mess.Sender == "You")
+            {
+                width = 50;
+            }
+            MC.Location = new Point(width, height);
+            messagetextBox.Clear();
+            messagesPanel.Controls.Add(MC);
+            MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0);
+            messagesPanel.ScrollControlIntoView(MC);
+        }
+
+        private void disconectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(connected && tcpClient != null) 
+            { 
+                tcpClient.Close();
+                connected = false;
+                Add_Label("Disconnected");
+                disconectToolStripMenuItem.Enabled = false;
+                connectToolStripMenuItem.Enabled = true;
             }
         }
     }

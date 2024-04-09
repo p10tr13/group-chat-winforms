@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Messages;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsLab
@@ -72,7 +73,20 @@ namespace WinFormsLab
             messageTextBox.Text = text;
             nameLabel.Location = new Point(5, 5);
             dateLabel.Location = new Point(this.Width - dateLabel.Width - 5, this.Height - dateLabel.Height - 5);
-            Anchor = AnchorStyles.Left | AnchorStyles.Top;
+            Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
+            Set_Preferred_Height();
+        }
+
+        public messageControl(Messages.Message mess)
+        {
+            InitializeComponent();
+            this.mess = mess;
+            nameLabel.Text = mess.Sender;
+            dateLabel.Text = mess.Time.ToString("HH:mm");
+            messageTextBox.Text = mess.Text;
+            nameLabel.Location = new Point(5, 5);
+            dateLabel.Location = new Point(this.Width - dateLabel.Width - 5, this.Height - dateLabel.Height - 5);
+            Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
             Set_Preferred_Height();
         }
 

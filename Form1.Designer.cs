@@ -32,7 +32,13 @@
             sendButton = new Button();
             tableLayoutPanel1 = new TableLayoutPanel();
             messagesPanel = new Panel();
+            menuStrip = new MenuStrip();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            disconectToolStripMenuItem = new ToolStripMenuItem();
+            connectToolStripMenuItem = new ToolStripMenuItem();
+            exitToolStripMenuItem = new ToolStripMenuItem();
             tableLayoutPanel1.SuspendLayout();
+            menuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // messagetextBox
@@ -75,14 +81,51 @@
             // 
             // messagesPanel
             // 
+            messagesPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             messagesPanel.AutoScroll = true;
-            messagesPanel.Dock = DockStyle.Fill;
-            messagesPanel.Location = new Point(0, 0);
+            messagesPanel.Location = new Point(0, 26);
             messagesPanel.Margin = new Padding(2);
             messagesPanel.Name = "messagesPanel";
-            messagesPanel.Size = new Size(265, 297);
+            messagesPanel.Size = new Size(265, 271);
             messagesPanel.TabIndex = 2;
-            messagesPanel.SizeChanged += messagesPanel_SizeChanged;
+            // 
+            // menuStrip
+            // 
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
+            menuStrip.Location = new Point(0, 0);
+            menuStrip.Name = "menuStrip";
+            menuStrip.Size = new Size(265, 24);
+            menuStrip.TabIndex = 3;
+            menuStrip.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { disconectToolStripMenuItem, connectToolStripMenuItem, exitToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new Size(37, 20);
+            fileToolStripMenuItem.Text = "File";
+            // 
+            // disconectToolStripMenuItem
+            // 
+            disconectToolStripMenuItem.Enabled = false;
+            disconectToolStripMenuItem.Name = "disconectToolStripMenuItem";
+            disconectToolStripMenuItem.Size = new Size(180, 22);
+            disconectToolStripMenuItem.Text = "Disconect...";
+            disconectToolStripMenuItem.Click += disconectToolStripMenuItem_Click;
+            // 
+            // connectToolStripMenuItem
+            // 
+            connectToolStripMenuItem.Name = "connectToolStripMenuItem";
+            connectToolStripMenuItem.Size = new Size(180, 22);
+            connectToolStripMenuItem.Text = "Connect";
+            connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
             // Form1
             // 
@@ -91,14 +134,20 @@
             ClientSize = new Size(265, 326);
             Controls.Add(messagesPanel);
             Controls.Add(tableLayoutPanel1);
+            Controls.Add(menuStrip);
             Margin = new Padding(2);
             MinimumSize = new Size(229, 304);
             Name = "Form1";
+            ShowIcon = false;
             Text = "Group Chat";
             KeyDown += Form1_KeyDown;
+            Resize += Form1_Resize;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            menuStrip.ResumeLayout(false);
+            menuStrip.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -108,5 +157,12 @@
         private TableLayoutPanel tableLayoutPanel1;
         private messageControl messageControl1;
         private Panel messagesPanel;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem toolStripMenuItem2;
+        private MenuStrip menuStrip;
+        private ToolStripMenuItem fileToolStripMenuItem;
+        private ToolStripMenuItem disconectToolStripMenuItem;
+        private ToolStripMenuItem connectToolStripMenuItem;
+        private ToolStripMenuItem exitToolStripMenuItem;
     }
 }
