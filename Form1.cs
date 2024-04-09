@@ -1,14 +1,19 @@
 using System.Net.Sockets;
+using System.Text.Json;
 
 namespace WinFormsLab
 {
     public partial class Form1 : Form
     {
-        int you_not_you_counter = 0;
-
         public bool connected;
 
         TcpClient? tcpClient;
+
+        StreamWriter writer;
+
+        StreamReader reader;
+
+        string sender = " ";
 
         public Form1()
         {
@@ -24,16 +29,16 @@ namespace WinFormsLab
             if (messagetextBox.Text.Length == 0)
                 return;
             messageControl MC;
-            if (you_not_you_counter % 2 == 0)
-            {
-                MC = new messageControl("You", messagetextBox.Text, DateTime.Now);
-            }
-            else
-            {
-                MC = new messageControl("NotYou", messagetextBox.Text, DateTime.Now);
-            }
+            Messages.Message mess = new Messages.Message(this.sender, messagetextBox.Text, DateTime.Now);
+            MC = new messageControl("You",messagetextBox.Text, DateTime.Now);
             Add_Message(MC);
-            you_not_you_counter++;
+            if(connected)
+            {
+                string mess_json = JsonSerializer.Serialize<Messages.Message>(mess) + '\n';
+                writer.Write(mess_json);
+                writer.Flush();
+            }
+            messagetextBox.Clear();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -88,6 +93,8 @@ namespace WinFormsLab
             if (connected)
             {
                 connected = false;
+                tcpClient.Dispose();
+                tcpClient.Close();
             }
             Close();
         }
@@ -98,13 +105,18 @@ namespace WinFormsLab
             connectionDialog.ShowDialog();
         }
 
-        public void Update_Client(TcpClient client)
+        public void Update_Client(TcpClient client, StreamReader rd, StreamWriter wr, string sender)
         {
             tcpClient = client;
             connected = true;
             connectToolStripMenuItem.Enabled = false;
             disconectToolStripMenuItem.Enabled = true;
+            reader = rd;
+            writer = wr;
+            this.sender = sender;
             Add_Label("Connected");
+            Thread receiver = new Thread(Receive_Messages);
+            receiver.Start();
         }
 
         private void Add_Label(string text)
@@ -137,16 +149,57 @@ namespace WinFormsLab
                 width = 50;
             }
             MC.Location = new Point(width, height);
-            messagetextBox.Clear();
             messagesPanel.Controls.Add(MC);
             MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0);
             messagesPanel.ScrollControlIntoView(MC);
+        }
+
+        private void Add_Message2(Messages.Message message) 
+        {
+            int height = 0, width = 0;
+            messageControl MC = new messageControl(message);
+            if (messagesPanel.Controls.Count > 0)
+            {
+                Control lastMessage = messagesPanel.Controls[messagesPanel.Controls.Count - 1];
+                height = lastMessage.Bottom + 5;
+            }
+            if (MC.mess.Sender == "You")
+            {
+                width = 50;
+            }
+            MC.Location = new Point(width, height);
+            messagesPanel.Controls.Add(MC);
+            MC.Width = messagesPanel.Width - 50 - (messagesPanel.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0);
+            messagesPanel.ScrollControlIntoView(MC);
+        }
+
+        private void Receive_Messages()
+        {
+            if(tcpClient != null) 
+            {
+                while(connected)
+                {
+                    string? received_msg_json;
+                    try
+                    {
+                        received_msg_json = reader.ReadLine();
+                    }
+                    catch(Exception) { reader.Close();  return; }
+                    
+                    if (received_msg_json != string.Empty || received_msg_json != null)
+                    {
+                        Messages.Message message = JsonSerializer.Deserialize<Messages.Message>(received_msg_json);
+                        messagesPanel.Invoke(Add_Message2, message);
+                    }
+                }
+            }
         }
 
         private void disconectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if(connected && tcpClient != null) 
             { 
+                tcpClient.Dispose();
                 tcpClient.Close();
                 connected = false;
                 Add_Label("Disconnected");
