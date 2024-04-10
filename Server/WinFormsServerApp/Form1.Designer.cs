@@ -30,6 +30,7 @@
         {
             mainTableLayoutPanel = new TableLayoutPanel();
             splitContainer1 = new SplitContainer();
+            keyCheckBox = new CheckBox();
             usernameLabel = new Label();
             adressLabel = new Label();
             keyLabel = new Label();
@@ -82,6 +83,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(keyCheckBox);
             splitContainer1.Panel1.Controls.Add(usernameLabel);
             splitContainer1.Panel1.Controls.Add(adressLabel);
             splitContainer1.Panel1.Controls.Add(keyLabel);
@@ -103,6 +105,20 @@
             splitContainer1.Size = new Size(404, 355);
             splitContainer1.SplitterDistance = 134;
             splitContainer1.TabIndex = 1;
+            // 
+            // keyCheckBox
+            // 
+            keyCheckBox.Anchor = AnchorStyles.Right;
+            keyCheckBox.AutoSize = true;
+            keyCheckBox.Checked = true;
+            keyCheckBox.CheckState = CheckState.Checked;
+            keyCheckBox.Location = new Point(321, 63);
+            keyCheckBox.Name = "keyCheckBox";
+            keyCheckBox.Size = new Size(76, 19);
+            keyCheckBox.TabIndex = 12;
+            keyCheckBox.Text = "Show key";
+            keyCheckBox.UseVisualStyleBackColor = true;
+            keyCheckBox.CheckedChanged += keyCheckBox_CheckedChanged;
             // 
             // usernameLabel
             // 
@@ -151,7 +167,7 @@
             usernameTextBox.Name = "usernameTextBox";
             usernameTextBox.Size = new Size(62, 23);
             usernameTextBox.TabIndex = 7;
-            usernameTextBox.Text = "user";
+            usernameTextBox.Text = "Server";
             // 
             // addressTextBox
             // 
@@ -241,9 +257,11 @@
             // logTextBox
             // 
             logTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            logTextBox.BackColor = SystemColors.Window;
             logTextBox.Location = new Point(0, 0);
             logTextBox.Multiline = true;
             logTextBox.Name = "logTextBox";
+            logTextBox.ReadOnly = true;
             logTextBox.ScrollBars = ScrollBars.Vertical;
             logTextBox.Size = new Size(404, 185);
             logTextBox.TabIndex = 0;
@@ -328,5 +346,6 @@
         private DataGridViewTextBoxColumn IDDGV;
         private DataGridViewTextBoxColumn nameDGV;
         private DataGridViewTextBoxColumn disconnectDGV;
+        private CheckBox keyCheckBox;
     }
 }
