@@ -246,6 +246,7 @@
             sendButton.TabIndex = 2;
             sendButton.Text = "Send";
             sendButton.UseVisualStyleBackColor = true;
+            sendButton.Click += sendButton_Click;
             // 
             // sendTextBox
             // 
@@ -254,6 +255,7 @@
             sendTextBox.Name = "sendTextBox";
             sendTextBox.Size = new Size(312, 23);
             sendTextBox.TabIndex = 1;
+            sendTextBox.KeyDown += sendTextBox_KeyDown;
             // 
             // logTextBox
             // 
@@ -318,6 +320,7 @@
             MinimumSize = new Size(700, 400);
             Name = "Form1";
             Text = "Server";
+            KeyDown += Form1_KeyDown;
             mainTableLayoutPanel.ResumeLayout(false);
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel1.PerformLayout();
