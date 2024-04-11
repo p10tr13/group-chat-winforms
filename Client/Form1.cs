@@ -184,13 +184,21 @@ namespace WinFormsLab
                     {
                         received_msg_json = reader.ReadLine();
                     }
-                    catch(Exception) 
-                    { reader.Close(); return; }
+                    catch(Exception ex) 
+                    {
+                        sendButton.Invoke(Disconnect);
+                        reader.Close(); return;
+                    }
                     
                     if (received_msg_json != string.Empty && received_msg_json != null)
                     {
                         Messages.Message message = JsonSerializer.Deserialize<Messages.Message>(received_msg_json);
                         messagesPanel.Invoke(Add_Message2, message);
+                    }
+                    if(received_msg_json != string.Empty || received_msg_json != null)
+                    {
+                        sendButton.Invoke(Disconnect);
+                        return;
                     }
                 }
             }
@@ -200,6 +208,19 @@ namespace WinFormsLab
         {
             if(connected && tcpClient != null) 
             { 
+                tcpClient.Dispose();
+                tcpClient.Close();
+                connected = false;
+                Add_Label("Disconnected");
+                disconectToolStripMenuItem.Enabled = false;
+                connectToolStripMenuItem.Enabled = true;
+            }
+        }
+
+        private void Disconnect()
+        {
+            if (connected && tcpClient != null)
+            {
                 tcpClient.Dispose();
                 tcpClient.Close();
                 connected = false;
