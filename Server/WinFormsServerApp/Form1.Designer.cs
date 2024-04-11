@@ -268,6 +268,7 @@
             logTextBox.ScrollBars = ScrollBars.Vertical;
             logTextBox.Size = new Size(404, 185);
             logTextBox.TabIndex = 0;
+            logTextBox.TextChanged += logTextBox_TextChanged;
             // 
             // dataGridView
             // 

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsServerApp
 {
@@ -245,8 +246,15 @@ namespace WinFormsServerApp
                 string json_mess = JsonSerializer.Serialize(mess);
                 foreach (var client in blocking)
                 {
-                    client.Item4.WriteLine(json_mess);
-                    client.Item4.Flush();
+                    try
+                    {
+                        client.Item4.WriteLine(json_mess);
+                        client.Item4.Flush();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log(ex.Message);
+                    }
                 }
             }
         }
@@ -255,7 +263,7 @@ namespace WinFormsServerApp
         {
             if (e.KeyCode == Keys.Enter)
             {
-                sendButton_Click(null,null);
+                sendButton_Click(null, null);
             }
         }
 
@@ -265,6 +273,12 @@ namespace WinFormsServerApp
             {
                 sendButton_Click(null, null);
             }
+        }
+
+        private void logTextBox_TextChanged(object sender, EventArgs e)
+        {
+            logTextBox.SelectionStart = logTextBox.TextLength;
+            logTextBox.ScrollToCaret();
         }
     }
 }

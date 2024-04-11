@@ -195,7 +195,7 @@ namespace WinFormsLab
                         Messages.Message message = JsonSerializer.Deserialize<Messages.Message>(received_msg_json);
                         messagesPanel.Invoke(Add_Message2, message);
                     }
-                    if(received_msg_json != string.Empty || received_msg_json != null)
+                    else if(received_msg_json == string.Empty || received_msg_json == null)
                     {
                         sendButton.Invoke(Disconnect);
                         return;
