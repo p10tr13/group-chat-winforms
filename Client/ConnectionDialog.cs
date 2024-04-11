@@ -39,16 +39,17 @@ namespace WinFormsLab
         private void connectButton_Click(object sender, EventArgs e)
         {
             connectButton.Enabled = false;
-            if (addressTextBox.Text.Length == 0 || keyTextBox.Text.Length == 0 ||
-                usernameTextBox.Text.Length == 0 || portTextBox.Text.Length == 0)
-            { return; }
+            if (addressTextBox.Text.Length == 0 || usernameTextBox.Text.Length == 0 || portTextBox.Text.Length == 0)
+            { connectButton.Enabled = true; return; }
             try
             {
                 TcpClient Client = new TcpClient(addressTextBox.Text, int.Parse(portTextBox.Text));
                 progressBar.Value = 25;
                 StreamWriter writer = new StreamWriter(Client.GetStream());
                 StreamReader reader = new StreamReader(Client.GetStream());
-                Messages.Authorization auth = new Messages.Authorization(usernameTextBox.Text, keyTextBox.Text);
+                Messages.Authorization auth;
+                if (keyTextBox.Text.Length == 0) { auth = new Messages.Authorization(usernameTextBox.Text, string.Empty); }
+                else { auth = new Messages.Authorization(usernameTextBox.Text, keyTextBox.Text); }
                 string json_auth = JsonSerializer.Serialize(auth);
                 writer.WriteLine(json_auth);
                 writer.Flush();
@@ -72,7 +73,7 @@ namespace WinFormsLab
                     throw new Exception("Unauthorized");
                 }
                 progressBar.Value = 100;
-                parent.Update_Client(Client, reader, writer,usernameTextBox.Text);
+                parent.Update_Client(Client, reader, writer, usernameTextBox.Text);
                 MessageBox.Show("Udało się połączyć z serwerem", "Success");
                 Close();
             }

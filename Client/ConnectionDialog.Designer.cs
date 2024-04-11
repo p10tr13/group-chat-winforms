@@ -83,6 +83,7 @@
             portTextBox.Name = "portTextBox";
             portTextBox.Size = new Size(80, 23);
             portTextBox.TabIndex = 4;
+            portTextBox.Text = "9000";
             // 
             // keyTextBox
             // 
@@ -97,6 +98,7 @@
             addressTextBox.Name = "addressTextBox";
             addressTextBox.Size = new Size(80, 23);
             addressTextBox.TabIndex = 6;
+            addressTextBox.Text = "127.0.0.1";
             // 
             // usernameTextBox
             // 
@@ -104,6 +106,7 @@
             usernameTextBox.Name = "usernameTextBox";
             usernameTextBox.Size = new Size(80, 23);
             usernameTextBox.TabIndex = 7;
+            usernameTextBox.Text = "user_mine";
             // 
             // showKeyCheckBox
             // 

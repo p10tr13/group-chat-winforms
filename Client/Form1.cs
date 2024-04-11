@@ -93,8 +93,8 @@ namespace WinFormsLab
             if (connected)
             {
                 connected = false;
-                tcpClient.Dispose();
                 tcpClient.Close();
+                tcpClient.Dispose();
             }
             Close();
         }
@@ -184,9 +184,10 @@ namespace WinFormsLab
                     {
                         received_msg_json = reader.ReadLine();
                     }
-                    catch(Exception) { reader.Close();  return; }
+                    catch(Exception) 
+                    { reader.Close(); return; }
                     
-                    if (received_msg_json != string.Empty || received_msg_json != null)
+                    if (received_msg_json != string.Empty && received_msg_json != null)
                     {
                         Messages.Message message = JsonSerializer.Deserialize<Messages.Message>(received_msg_json);
                         messagesPanel.Invoke(Add_Message2, message);

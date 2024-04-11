@@ -49,7 +49,7 @@
             dataGridView = new DataGridView();
             IDDGV = new DataGridViewTextBoxColumn();
             nameDGV = new DataGridViewTextBoxColumn();
-            disconnectDGV = new DataGridViewTextBoxColumn();
+            disconnectDGV = new DataGridViewButtonColumn();
             mainTableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -214,6 +214,7 @@
             disconnectAllButton.TabIndex = 2;
             disconnectAllButton.Text = "Disconnect All";
             disconnectAllButton.UseVisualStyleBackColor = true;
+            disconnectAllButton.Click += disconnectAllButton_Click;
             // 
             // clearButton
             // 
@@ -281,6 +282,7 @@
             dataGridView.RowHeadersVisible = false;
             dataGridView.Size = new Size(268, 355);
             dataGridView.TabIndex = 2;
+            dataGridView.CellContentClick += dataGridView_CellContentClick;
             // 
             // IDDGV
             // 
@@ -301,6 +303,10 @@
             disconnectDGV.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
             disconnectDGV.HeaderText = "Disconnect";
             disconnectDGV.Name = "disconnectDGV";
+            disconnectDGV.Resizable = DataGridViewTriState.True;
+            disconnectDGV.SortMode = DataGridViewColumnSortMode.Automatic;
+            disconnectDGV.Text = "Disconnect";
+            disconnectDGV.UseColumnTextForButtonValue = true;
             disconnectDGV.Width = 91;
             // 
             // Form1
@@ -343,9 +349,9 @@
         private Label adressLabel;
         private Label usernameLabel;
         private DataGridView dataGridView;
+        private CheckBox keyCheckBox;
         private DataGridViewTextBoxColumn IDDGV;
         private DataGridViewTextBoxColumn nameDGV;
-        private DataGridViewTextBoxColumn disconnectDGV;
-        private CheckBox keyCheckBox;
+        private DataGridViewButtonColumn disconnectDGV;
     }
 }

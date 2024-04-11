@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -11,7 +12,10 @@ namespace WinFormsServerApp
         string key;
         int port;
         bool running;
+        int ID_counter;
 
+        BlockingCollection<(int, string, TcpClient, StreamWriter, StreamReader)> blocking =
+            new BlockingCollection<(int, string, TcpClient, StreamWriter, StreamReader)>();
 
         public Form1()
         {
@@ -46,12 +50,16 @@ namespace WinFormsServerApp
                     portTextBox.Text = string.Empty;
                     startStopButton.Text = "Stop";
                     running = true;
+                    Thread listen = new Thread(Listen);
+                    listen.Start();
                 }
             }
             else if (startStopButton.Text == "Stop")
             {
                 server.Stop();
-                logTextBox.Text += DateTime.Now.ToString("HH:mm") + " | Shutting down current connection.\r\n";
+                running = false;
+                disconnectAllButton.Select();
+                Log("Shutting down current connection.");
                 startStopButton.Text = "Start";
             }
         }
@@ -67,14 +75,14 @@ namespace WinFormsServerApp
                 IPAddress address = IPAddress.Parse(IP);
                 server = new TcpListener(address, port);
                 server.Start();
-                logTextBox.Text += DateTime.Now.ToString("HH:mm") + " | Listening for incomming connections...\r\n";
-                logTextBox.Text += DateTime.Now.ToString("HH:mm") + " | " + address.ToString() +
+                Log("Listening for incomming connections...");
+                    logTextBox.Text += DateTime.Now.ToString("HH:mm") + " | " + address.ToString() +
                     ", Port: " + port.ToString() + "\r\n";
                 return true;
             }
             catch (Exception ex)
             {
-                logTextBox.Text += DateTime.Now.ToString("HH:mm") + " | " + ex.Message.ToString() + "\r\n";
+                Log(ex.Message.ToString());
                 return false;
             }
         }
@@ -95,33 +103,105 @@ namespace WinFormsServerApp
         {
             try
             {
-                while(running)
+                while (running)
                 {
                     TcpClient clinet = server.AcceptTcpClient();
+                    logTextBox.Invoke(Log, "New client... Authorizing");
                     StreamReader reader = new StreamReader(clinet.GetStream());
+                    StreamWriter writer = new StreamWriter(clinet.GetStream());
                     string? mess = reader.ReadLine();
                     if (mess == null) { continue; }
                     Messages.Authorization? auth = JsonSerializer.Deserialize<Messages.Authorization>(mess);
-                    if(auth != null)
+                    if (auth != null)
                     {
-                        StreamWriter writer = new StreamWriter(clinet.GetStream());
                         Messages.Message ret_mess;
-                        if (auth.Key == key || key == string.Empty)
+                        if (auth.Key == key || key == string.Empty || key == null)
                         {
                             ret_mess = new Messages.Message("server", "Authorized", DateTime.Now);
+                            logTextBox.Invoke(Log, auth.Sender + " has connected");
+                            dataGridView.Invoke(new Action(() =>
+                            {
+                                dataGridView.Rows.Add(ID_counter, auth.Sender);
+                            }));
+                            blocking.Add((ID_counter++, auth.Sender, clinet, writer, reader));
                         }
                         else
                         {
+                            logTextBox.Invoke(Log, auth.Sender + " authorization failed");
                             ret_mess = new Messages.Message("server", "Unauthorized", DateTime.Now);
                         }
-                        string ret_mess_json = JsonSerializer.Serialize(ret_mess) + "\n";
+                        string ret_mess_json = JsonSerializer.Serialize(ret_mess);
                         writer.WriteLine(ret_mess_json);
+                        writer.Flush();
                     }
                 }
             }
-            catch(Exception ex) 
-            { 
-                
+            catch (Exception ex)
+            {
+                logTextBox.Invoke(Log, ex.Message);
+            }
+        }
+
+        private void Log(string message)
+        {
+            logTextBox.Text += DateTime.Now.ToString("HH:mm") + " | " + message + "\r\n";
+        }
+
+        private void disconnectAllButton_Click(object sender, EventArgs e)
+        {
+            while (blocking.Count > 0)
+            {
+                var client = blocking.Take();
+                var tcp = client.Item3;
+                var writer = client.Item4;
+                var reader = client.Item5;
+                try
+                {
+                    tcp.Close();
+                    writer.Close();
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    Log(ex.Message);
+                }
+                Log($"{client.Item2} has disconnected");
+            }
+            dataGridView.Rows.Clear();
+        }
+
+        private void dataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if(e.ColumnIndex == dataGridView.Columns["disconnectDGV"].Index && e.RowIndex >= 0) 
+            {
+                int id = (int)dataGridView.Rows[e.RowIndex].Cells[0].Value;
+                var blocking_help = new BlockingCollection<(int, string, TcpClient, StreamWriter, StreamReader)>();
+                while(blocking.Count > 0)
+                {
+                    var client = blocking.Take();
+                    if(client.Item1 != id)
+                    {
+                        blocking_help.Add(client);
+                        continue;
+                    }
+                    var tcp = client.Item3;
+                    var writer = client.Item4;
+                    var reader = client.Item5;
+                    try
+                    {
+                        tcp.Close();
+                        writer.Close();
+                        reader.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log(ex.Message);
+                    }
+                    Log($"{client.Item2} has disconnected");
+                }
+                blocking.Dispose();
+                blocking = blocking_help;
+                dataGridView.Rows.RemoveAt(e.RowIndex);
             }
         }
     }
