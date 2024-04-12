@@ -48,9 +48,9 @@ namespace WinFormsServerApp
                         keyTextBox.Text = string.Empty;
                     }
                     name = usernameTextBox.Text;
-                    addressTextBox.Text = string.Empty;
-                    usernameTextBox.Text = string.Empty;
-                    portTextBox.Text = string.Empty;
+                    addressTextBox.Enabled = false;
+                    usernameTextBox.Enabled = false;
+                    portTextBox.Enabled = false;
                     startStopButton.Text = "Stop";
                     running = true;
                     Thread listen = new Thread(Listen);
@@ -61,11 +61,17 @@ namespace WinFormsServerApp
             }
             else if (startStopButton.Text == "Stop")
             {
-                server.Stop();
                 running = false;
-                disconnectAllButton.Select();
+                disconnectAllButton_Click(null, null);
                 Log("Shutting down current connection.");
                 startStopButton.Text = "Start";
+                server.Stop();
+                key = string.Empty;
+                port = 0;
+                name = string.Empty;
+                addressTextBox.Enabled = true;
+                usernameTextBox.Enabled = true;
+                portTextBox.Enabled = true;
             }
         }
 
@@ -128,6 +134,20 @@ namespace WinFormsServerApp
                             {
                                 dataGridView.Rows.Add(ID_counter, auth.Sender);
                             }));
+                            Messages.Message new_mess = new Messages.Message(name, $"{auth.Sender} has connected", DateTime.Now);
+                            string json_mess = JsonSerializer.Serialize(new_mess);
+                            foreach (var client in blocking)
+                            {
+                                try
+                                {
+                                    client.Item4.WriteLine(json_mess);
+                                    client.Item4.Flush();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log(ex.Message);
+                                }
+                            }
                             blocking.Add((ID_counter++, auth.Sender, clinet, writer, reader));
                         }
                         else
@@ -139,6 +159,13 @@ namespace WinFormsServerApp
                         writer.WriteLine(ret_mess_json);
                         writer.Flush();
                     }
+                }
+            }
+            catch (SocketException ex)
+            {
+                if (ex.ErrorCode != 10004)
+                {
+                    logTextBox.Invoke(Log, ex.Message);
                 }
             }
             catch (Exception ex)
@@ -186,7 +213,9 @@ namespace WinFormsServerApp
                     {
                         string? json_mess = reader.ReadLine();
                         Messages.Message mess = JsonSerializer.Deserialize<Messages.Message>(json_mess);
-                        logTextBox.Invoke(Log, $"{mess.Sender}: {mess.Text}");
+                        mess.Sender = client.Item2;
+                        json_mess = JsonSerializer.Serialize(mess);
+                        logTextBox.Invoke(Log, $"{client.Item2}: {mess.Text}");
                         foreach (var listener in blocking)
                         {
                             if (listener != client)
