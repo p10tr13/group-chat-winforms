@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
+﻿using System.Net.Sockets;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace WinFormsLab
 {
@@ -58,7 +48,7 @@ namespace WinFormsLab
                 if (received_msg_json == string.Empty)
                 {
                     progressBar.Value = 0;
-                    MessageBox.Show("Błąd połączenia (brak odpowiedzi od serwera)");
+                    MessageBox.Show("Connection error (no server response)");
                     connectButton.Enabled = true;
                     writer.Close();
                     reader.Close();
@@ -74,7 +64,7 @@ namespace WinFormsLab
                 }
                 progressBar.Value = 100;
                 parent.Update_Client(Client, reader, writer, usernameTextBox.Text);
-                MessageBox.Show("Udało się połączyć z serwerem", "Success");
+                MessageBox.Show("Successfully connected to the server", "Success");
                 Close();
             }
             catch (Exception ex)
